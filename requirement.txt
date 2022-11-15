@@ -1,1 +1,1 @@
-from fastapi import FastAPI
+fastapi

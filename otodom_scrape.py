@@ -1,4 +1,9 @@
-from playwright.sync_api import sync_playwright
+try:
+    from playwright.sync_api import sync_playwright
+except:
+    from subprocess import Popen, PIPE
+    p = Popen([sys.executable, "-m", "playwright", "install"], stdin=PIPE, stdout=PIPE, stderr=PIPE)    
+    from playwright.sync_api import sync_playwright
 import time
 import pandas as pd
 import json

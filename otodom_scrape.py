@@ -1,26 +1,32 @@
 from playwright.sync_api import sync_playwright
 import time
 import pandas as pd
+import json
+
 
 def clear_txt(text):
 
     try:
-        return int(''.join(filter(str.isdigit,text.replace("²",""))))
+        if "Zapytaj" in text:
+            return text
+        else:
+            text_str = "".join(text.split()).split("z")[0]
+            return text_str
     except ValueError: 
         return 0 
 
 data_records = []
 
-def get_page_content():
+def get_page_content(page_limit=100):
     with sync_playwright() as p:
 
         browser = p.chromium.launch(headless=True, channel="chrome")
         context = browser.new_context()
         page = context.new_page()
 
-        for page_number in range(1,15):
+        for page_number in range(1,2):
 
-            page.goto(f"https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page={page_number}&limit=10&market=ALL&distanceRadius=0&priceMin=300000&priceMax=400000&by=PRICE&direction=ASC")
+            page.goto(f"https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page={page_number}&limit={page_limit}&market=ALL&distanceRadius=0&priceMin=300000&priceMax=400000&by=PRICE&direction=ASC")
             time.sleep(1)
             if page_number == 1:
                 page.get_by_role("button", name="Akceptuję").click()
@@ -41,18 +47,24 @@ def get_page_content():
                 location = f.query_selector('//p[@class="css-80g06k es62z2j12"]').inner_text().replace(",","")
 
                 data_row = [url, pirce, price_per_m2, square_m, location]
-                print(data_row)
+
                 data_records.append(data_row)
 
-get_page_content()
-
-df = pd.DataFrame(data_records, columns = ['URL', 'Price', 'Pln/m2', 'Square meters', 'location'])
-print(df.shape)
-print(df.head())
-df.drop_duplicates(subset=['URL'])
-df = df.sort_values(['Price', 'Square meters'],
+    df = pd.DataFrame(data_records, columns = ['URL', 'Price', 'Pln/m2', 'Square meters', 'location'])
+    df.drop_duplicates(subset=['URL'])
+    df = df.sort_values(['Price', 'Square meters'],
               ascending = [True, True])
-df.to_csv("ceny_mieszkan.csv", sep=';', index=False)
+    output = df.to_dict("record")   
+    return  output
+
+
+# df = pd.DataFrame(data_records, columns = ['URL', 'Price', 'Pln/m2', 'Square meters', 'location'])
+# print(df.shape)
+# print(df.head())
+# df.drop_duplicates(subset=['URL'])
+# df = df.sort_values(['Price', 'Square meters'],
+#               ascending = [True, True])
+# df.to_csv("ceny_mieszkan.csv", sep=';', index=False)
 
 
         

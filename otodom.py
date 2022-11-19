@@ -7,16 +7,17 @@ import time
 import re
 import pandas as pd
 
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+#chrome_options = webdriver.ChromeOptions()
+#chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")   
-driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+#chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--disable-dev-shm-usage")
+# chrome_options.add_argument("--no-sandbox")   
+#chrome_options.add_argument('window-size=1200x600')
+#driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
 #for local testing
-#path = 'chromedriver.exe'
-#driver = webdriver.Chrome(path, chrome_options=chrome_options)
+path = 'chromedriver.exe'
+driver = webdriver.Chrome(executable_path=path)#, options=chrome_options)
 
 def clear_txt(text):
 
@@ -36,10 +37,10 @@ def get_data():
     driver.maximize_window()
     driver.get(website)
 
-    time.sleep(6)
-    cookies_button = driver.find_element(by=By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
-    time.sleep(1)
-    cookies_button.click()
+    # time.sleep(6)
+    # cookies_button = driver.find_element(by=By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
+    # time.sleep(1)
+    # cookies_button.click()
     time.sleep(2)
 
     location = []

@@ -37,10 +37,11 @@ def get_data(page_limit: int = 100):
     driver.maximize_window()
     driver.get(website)
 
-    # time.sleep(6)
-    # cookies_button = driver.find_element(by=By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
-    # time.sleep(1)
-    # cookies_button.click()
+    time.sleep(6)
+    #cookies_button = driver.find_element(by=By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
+    cookies_button = driver.find_element(By.ID, "onetrust-accept-btn-handler")
+    time.sleep(1)
+    cookies_button.click()
     time.sleep(2)
 
     location = []

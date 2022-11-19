@@ -2,19 +2,21 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-import chromedriver_autoinstaller
+#import chromedriver_autoinstaller
 import time
 import re
 import pandas as pd
 
-#chromedriver_autoinstaller.install()
-chrome_options = webdriver.ChromeOptions()
+
 chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--no-sandbox")   
 driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
-
+#for local testing
+#path = 'chromedriver.exe'
+#driver = webdriver.Chrome(path, chrome_options=chrome_options)
 
 def clear_txt(text):
 
@@ -29,12 +31,12 @@ def clear_txt(text):
 
 def get_data():
     website = 'https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page=1&limit=400&market=ALL&distanceRadius=0&priceMin=300000&priceMax=450000&by=PRICE&direction=ASC'
-    path = 'chromedriver.exe'
-    #driver = webdriver.Chrome(path, chrome_options=chrome_options)
+    
+    
     driver.maximize_window()
     driver.get(website)
 
-    time.sleep(2)
+    time.sleep(4)
     cookies_button = driver.find_element(by=By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
     cookies_button.click()
     time.sleep(2)
@@ -84,3 +86,5 @@ def get_data():
 
     driver.quit()
     return  output
+
+print(get_data())

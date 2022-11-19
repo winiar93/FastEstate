@@ -36,8 +36,9 @@ def get_data():
     driver.maximize_window()
     driver.get(website)
 
-    time.sleep(4)
+    time.sleep(6)
     cookies_button = driver.find_element(by=By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
+    time.sleep(1)
     cookies_button.click()
     time.sleep(2)
 

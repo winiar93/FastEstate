@@ -30,8 +30,8 @@ def clear_txt(text):
     except ValueError: 
         return 0 
 
-def get_data():
-    website = 'https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page=1&limit=400&market=ALL&distanceRadius=0&priceMin=300000&priceMax=450000&by=PRICE&direction=ASC'
+def get_data(page_limit: int = 100):
+    website = f'https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page=1&limit={page_limit}&market=ALL&distanceRadius=0&priceMin=300000&priceMax=450000&by=PRICE&direction=ASC'
     
     
     driver.maximize_window()

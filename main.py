@@ -4,6 +4,6 @@ import asyncio
 app = FastAPI()
 
 
-@app.get("/")
+@app.get("/api")
 def root():
     return get_data()

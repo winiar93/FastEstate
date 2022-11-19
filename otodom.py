@@ -30,7 +30,7 @@ def clear_txt(text):
 def get_data():
     website = 'https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page=1&limit=400&market=ALL&distanceRadius=0&priceMin=300000&priceMax=450000&by=PRICE&direction=ASC'
     path = 'chromedriver.exe'
-    driver = webdriver.Chrome(path, chrome_options=chrome_options)
+    #driver = webdriver.Chrome(path, chrome_options=chrome_options)
     driver.maximize_window()
     driver.get(website)
 

@@ -13,7 +13,7 @@ chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 #driver = webdriver.Chrome(os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
-driver = webdriver.Chrome("/.chromedriver/bin/chromedriver", options=chrome_options)
+driver = webdriver.Chrome("chromedriver", options=chrome_options)
 
 
 def clear_txt(text):

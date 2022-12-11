@@ -72,7 +72,9 @@ def get_data(page_limit: int = 100):
 
     df = df.sort_values(['Price', 'Size M2'],
                 ascending = [True, True])
-    output = df.to_dict("records")     
+    output = df.to_dict("records")   
+
+    df.to_csv("flats_data.csv", sep='\t')  
 
     driver.quit()
     return  output

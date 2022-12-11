@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 import re
 import pandas as pd
+import numpy as np
 
 chrome_options = webdriver.ChromeOptions()
 chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")

@@ -12,5 +12,6 @@ def root():
 @app.get("/data")
 def func():
     df = pd.read_csv("flats_data.csv", sep='\t')
+    df = df.fillna('')
     output = df.to_dict("records") 
     return output

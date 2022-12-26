@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from otodom import PageScraper as ps
+from otodom import PageScraper
 import asyncio
 import pandas as pd
-app = FastAPI()
 
+app = FastAPI()
+ps = PageScraper()
 
 @app.get("/api")
 def root():

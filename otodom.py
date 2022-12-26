@@ -8,18 +8,8 @@ import re
 import pandas as pd
 import numpy as np
 
-class PageScraper:
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--no-sandbox")   
-    #chrome_options.add_argument('window-size=1200x600')
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
-    #for local testing
-    # path = 'chromedriver.exe'
-    # driver = webdriver.Chrome(executable_path=path)#, options=chrome_options)
+class PageScraper:
 
     def clear_txt(text):
 
@@ -33,6 +23,18 @@ class PageScraper:
             return 0 
 
     def get_data(page_limit: int = 100):
+
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")   
+        #chrome_options.add_argument('window-size=1200x600')
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+        #for local testing
+        # path = 'chromedriver.exe'
+        # driver = webdriver.Chrome(executable_path=path)#, options=chrome_options)
 
         data = []
         website = f'https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page=1&limit={page_limit}&market=ALL&distanceRadius=0&priceMin=300000&priceMax=450000&by=PRICE&direction=ASC'
@@ -67,9 +69,9 @@ class PageScraper:
         df = pd.DataFrame(data, columns =['Price', 'Price per m2', 'Rooms', 'Size M2', 'URL', 'Location'])
         df.drop_duplicates(subset=['URL'])
 
-        df['Price'] = df['Price'].apply(clear_txt)
-        df['Price per m2'] = df['Price per m2'].apply(clear_txt)
-        df['Size M2'] = df['Size M2'].apply(clear_txt)
+        df['Price'] = df['Price'].apply(self.clear_txt)
+        df['Price per m2'] = df['Price per m2'].apply(self.clear_txt)
+        df['Size M2'] = df['Size M2'].apply(self.clear_txt)
 
         df = df.sort_values(['Price', 'Size M2'],
                     ascending = [True, True])

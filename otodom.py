@@ -2,7 +2,6 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-#import chromedriver_autoinstaller
 import time
 import re
 import pandas as pd
@@ -30,11 +29,7 @@ class PageScraper:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--no-sandbox")   
-        #chrome_options.add_argument('window-size=1200x600')
         driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
-        #for local testing
-        # path = 'chromedriver.exe'
-        # driver = webdriver.Chrome(executable_path=path)#, options=chrome_options)
 
         data = []
         website = f'https://www.otodom.pl/pl/wyszukiwanie/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?page=1&limit={page_limit}&market=ALL&distanceRadius=0&priceMin=300000&priceMax=450000&by=PRICE&direction=ASC'
@@ -43,9 +38,6 @@ class PageScraper:
         driver.get(website)
 
         time.sleep(2)
-
-        #CHECK
-        #cookies_button = driver.find_element(by=By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
         cookies_button = driver.find_element(By.ID, "onetrust-accept-btn-handler")
         time.sleep(1)
         cookies_button.click()

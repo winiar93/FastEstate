@@ -11,7 +11,7 @@ import numpy as np
 
 class PageScraper:
 
-    def clear_txt(text):
+    def clear_txt(self, text):
 
         try:
             if "Zapytaj" in text:
@@ -22,7 +22,7 @@ class PageScraper:
         except ValueError: 
             return 0 
 
-    def get_data(page_limit: int = 100):
+    def get_data(self, page_limit: int = 100):
 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")

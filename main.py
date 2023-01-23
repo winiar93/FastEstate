@@ -3,8 +3,10 @@ from otodom import PageScraper
 import asyncio
 import pandas as pd
 
-app = FastAPI()
+
 ps = PageScraper()
+app = FastAPI()
+
 
 @app.get("/api")
 async def root(page_limit: int = 100):

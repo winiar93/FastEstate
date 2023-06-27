@@ -1,14 +1,15 @@
 from fastapi import FastAPI
 from otodom import PageScraper
-from fastapi.responses import JSONResponse
-#import pandas as pd
 import json
 import logging
-from db_connector import get_sqlmodel_engine, insert_flat_offer
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from db_connector import get_sqlmodel_engine, insert_flat_offer, get_session
+from sqlmodel import Field, Session, SQLModel, create_engine, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sql_models import FlatOffers
+from fastapi import APIRouter, Depends, status, Response
+from fastapi.responses import JSONResponse
+
 
 engine = get_sqlmodel_engine()
 
@@ -46,19 +47,27 @@ async def insert_data():
     }
 
     output = JSONResponse(content=output_dict)
-
     return output
 
-# @app.get("/newest_offer")
-# async def func():
-#     df = pd.read_csv("flats_data.csv", sep='\t')
-#     df = df.fillna('')
-#     output = df.to_dict("records") 
-#     return output
+@app.get("/get_data")
+async def get_data(session: Session = Depends(get_session), page_size: int = 100, page: int = 0):
+    stmt = select(FlatOffers)
 
-# @app.get("/top_offer")
-# async def func():
-#     df = pd.read_csv("flats_data.csv", sep='\t')
-#     df = df.fillna('')
-#     output = df.to_dict("records") 
-#     return output
+    if page_size:
+        stmt = stmt.limit(page_size)
+    if page: 
+        stmt = stmt.offset(page*page_size)
+    
+    data = session.exec(stmt).all()
+    
+
+    reject_list  = ['investment_estimated_delivery', 'created_at', 'updated_at']
+
+    content = [{key: value for key, value in d.__dict__.items() if key not in reject_list} for d in data]
+    return content
+    
+
+@app.get("/top_offer")
+async def top_offer():
+
+    return {'test': 111}

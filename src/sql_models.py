@@ -21,13 +21,13 @@ class FlatOffers(SQLModel, table=True):
     offer_title: Optional[str] = None
     street: Optional[str] = None
     location: Optional[str] = None
-    total_price: Optional[str] = None
-    area_square_meters: Optional[str] = None
+    total_price: Optional[float] = None
+    area_square_meters: Optional[float] = None
     date_created_in_service: Optional[str] = None 
     offer_url: Optional[str] = None
     agency_name: Optional[str] = None
     rooms_number: Optional[str] = None
     investment_estimated_delivery: Optional[str] = None
-    price_per_square_meter: Optional[str] = None
+    price_per_square_meter: Optional[float] = None
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)
     updated_at: datetime = Field(default_factory=datetime.now, nullable=False)

@@ -1,5 +1,7 @@
 fastapi
 uvicorn
-selenium
-chromedriver-autoinstaller
 pandas
+requests
+beautifulsoup4
+sqlmodel
+psycopg2-binary

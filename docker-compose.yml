@@ -1,0 +1,84 @@
+version: "3.9"
+services:
+    postgres:
+      container_name: postgres
+      image: postgres
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER:-postgres}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Welcome1}
+        PGDATA: /data/postgres
+      volumes:
+        - postgres:/data/postgres
+      ports:
+        - "5432:5432"
+      restart: unless-stopped
+
+    pgadmin:
+      container_name: pgadmin
+      image: "dpage/pgadmin4"
+      restart: on-failure
+      environment:
+        PGADMIN_DEFAULT_EMAIL: admin@admin.com
+        PGADMIN_DEFAULT_PASSWORD: admin
+      ports:
+        - "8080:80"
+      volumes:
+        - pgadmin-data:/var/lib/pgadmin
+
+
+
+    # db:
+    #     container_name: sql-server-db
+    #     image: mcr.microsoft.com/mssql/server:2019-latest
+    #     environment:
+    #         SA_PASSWORD: Flats_api_123
+    #         ACCEPT_EULA: Y
+    #     ports:
+    #         - 1433:1433
+    #     volumes:
+    #      - ./sqlserver/data:/var/opt/mssql/data
+    #      - ./sqlserver/log:/var/opt/mssql/log
+    #      - ./sql_scripts:/sql_scripts/
+    #     command:
+    #         - /bin/bash
+    #         - -c
+    #         - |
+    #           # Launch MSSQL and send to background
+    #           /opt/mssql/bin/sqlservr &
+    #           pid=$$!
+    #           # Wait for it to be available
+    #           echo "Waiting for MS SQL to be available ⏳"
+    #           /opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -h-1 -V1 -U sa -P $$SA_PASSWORD -Q "SET NOCOUNT ON SELECT \"YAY WE ARE UP\" , @@servername"
+    #           is_up=$$?
+    #           while [ $$is_up -ne 0 ] ; do
+    #             echo -e $$(date)
+    #             /opt/mssql-tools/bin/sqlcmd -l 30 -S localhost -h-1 -V1 -U sa -P $$SA_PASSWORD -Q "SET NOCOUNT ON SELECT \"YAY WE ARE UP\" , @@servername"
+    #             is_up=$$?
+    #             sleep 5
+    #           done
+    #           # Run every script in /sql_scripts
+    #           # TODO set a flag so that this is only done once on creation,
+    #           #      and not every time the container runs
+    #           for foo in /sql_scripts/*.sql
+    #             do /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i $$foo
+    #           done
+    #           # trap SIGTERM and send same to sqlservr process for clean shutdown
+    #           trap "kill -15 $$pid" SIGTERM
+    #           # Wait on the sqlserver process
+    #           echo "All scripts have been executed. Waiting for MS SQL(pid $$pid) to terminate."
+    #           # Wait on the sqlserver process
+    #           wait $$pid
+    #           exit 0
+    web:
+          image: fastapi
+          container_name: fastapi
+          build: .
+          ports:
+            - 8000:8000
+          command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+          depends_on:
+            - postgres
+volumes:
+    postgres:
+    pgadmin-data:

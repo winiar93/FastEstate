@@ -6,3 +6,4 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY /src .
+COPY /sql_scripts /sql_scripts

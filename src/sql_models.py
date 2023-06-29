@@ -29,5 +29,6 @@ class FlatOffers(SQLModel, table=True):
     rooms_number: Optional[str] = None
     investment_estimated_delivery: Optional[str] = None
     price_per_square_meter: Optional[float] = None
+    rank: Optional[float] = None
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)
     updated_at: datetime = Field(default_factory=datetime.now, nullable=False)

@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sql_models import FlatOffers
 from fastapi import APIRouter, Depends, status, Response
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
 
 engine = get_sqlmodel_engine()
@@ -28,7 +29,7 @@ def on_startup():
 # http://localhost:8000/docs
 
 @app.get("/scrape_data", status_code=200)
-async def insert_data():
+async def insert_data(session: Session = Depends(get_session)):
 
     data = ps.run()
     inserted_enities_cnt = 0
@@ -39,6 +40,12 @@ async def insert_data():
 
         except Exception as err:
             logging.warning(f'Operation failed: \n {err}')
+
+
+    with open("./sql_scripts/offer_ranking.sql") as file:
+        query = text(file.read())
+        session.execute(query)
+        session.commit()
 
     output_dict = {
     "is_success": True if len(data) == inserted_enities_cnt else False,
@@ -67,7 +74,7 @@ async def get_data(session: Session = Depends(get_session), page_size: int = 100
     return content
     
 
-@app.get("/top_offer")
+@app.get("/best_offer")
 async def top_offer():
 
     return {'test': 111}

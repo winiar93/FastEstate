@@ -2,16 +2,7 @@
 
 This project is a real estate offers scraper written in Python. It allows you to scrape real estate offers from a specific source and store them in a PostgreSQL database. It also provides an API built with FastAPI, which enables users to fetch the offers and rank them based on certain criteria.
 
-```mermaid
-flowchart TD
-    A[webpage] --> S
-    S[scraper]-->B[database] 
-    D -->|trigger scraper| S
-    B --> C{API}
-    C --> D[scrape_data]
-    C --> E[get_data]
-    C -->F[get_file]
-```
+[![](https://mermaid.ink/img/pako:eNplj8sKg0AMRX9lyFp_wEWhagvdFezOkRI1jlJHJY5IUf-946NQaFbh3JMLmSBrcwIPirodsxLZiEcoG2HnHI-UdqgoEa57EtFOo7jPGDvixEI_ztFgir119jhc3dlwpRSxONT5e-xvTcF0vt-WnQQbCY_S51qX_CaXWJH5w9eNFlVNloIDmlhjlds3ptWSYErSJMGza478kiCbxXo4mDZ6Nxl4hgdyYOhsM4UVKkYNXoF1T8sHu79Whw?type=png)](https://mermaid.live/edit#pako:eNplj8sKg0AMRX9lyFp_wEWhagvdFezOkRI1jlJHJY5IUf-946NQaFbh3JMLmSBrcwIPirodsxLZiEcoG2HnHI-UdqgoEa57EtFOo7jPGDvixEI_ztFgir119jhc3dlwpRSxONT5e-xvTcF0vt-WnQQbCY_S51qX_CaXWJH5w9eNFlVNloIDmlhjlds3ptWSYErSJMGza478kiCbxXo4mDZ6Nxl4hgdyYOhsM4UVKkYNXoF1T8sHu79Whw)
 
 
 

@@ -7,10 +7,13 @@ import logging
 logging.getLogger().setLevel(logging.INFO)
 
 class PageScraper:
-    def __init__(self) -> None:
-        self.url = "https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page=1&limit=36&priceMin=300000&priceMax=450000&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
-        self.headers = {"User-Agent": "Mozilla/5.0"}
-        self.offers_data = None
+    def __init__(self, min_price:int = 300000, max_price:int = 450000) -> None:
+        self.headers: dict = {"User-Agent": "Mozilla/5.0"}
+        self.offers_data: list = None
+        self.min_price = min_price
+        self.max_price = max_price
+        self.url_page:int = 1
+        self.url: str = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={self.url_page}&limit=36&priceMin={self.min_price}&priceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
 
     def perform_request(self, url):
         try:
@@ -37,8 +40,8 @@ class PageScraper:
         offers_data = data["props"]["pageProps"]["data"]["searchAds"]["items"]
 
         for page in range(1, page_count+1):
-            pagination_url = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={page}&limit=36&priceMin=300000&priceMax=450000&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
-            data = response_data = self.perform_request(pagination_url)
+            self.url_page = page
+            data = response_data = self.perform_request(self.url)
             soup = bs(data.content, "html.parser")
             soup_list = soup.find(type="application/json")
             data = json.loads(soup_list.text)

@@ -5,3 +5,4 @@ requests
 beautifulsoup4
 sqlmodel
 psycopg2-binary
+pandas

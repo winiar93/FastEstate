@@ -7,12 +7,12 @@ from sql_models import FlatOffers
 from fastapi import FastAPI
 from fastapi import APIRouter, Depends, status, Response
 from fastapi.responses import JSONResponse
-
+from starlette.responses import FileResponse
 from sqlmodel import Field, Session, SQLModel, create_engine, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text, desc
-
+import pandas as pd
 from db_connector import get_sqlmodel_engine, insert_flat_offer, get_session
 
 
@@ -79,3 +79,13 @@ async def get_data(session: Session = Depends(get_session), page_size: int = 10,
 
     content = [{key: value for key, value in d.__dict__.items() if key not in reject_list} for d in data]
     return content
+
+@app.get("/get_file")
+async def get_data():
+    file_name ='offers_of_flats.csv'
+    stmt = select(FlatOffers)
+    engine = get_sqlmodel_engine()
+    df = pd.read_sql_query(stmt, con=engine)
+    df.to_csv(file_name, sep='\t')
+    engine.dispose()
+    return FileResponse(file_name, media_type='application/octet-stream', filename=file_name)

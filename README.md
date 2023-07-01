@@ -2,6 +2,19 @@
 
 This project is a real estate offers scraper written in Python. It allows you to scrape real estate offers from a specific source and store them in a PostgreSQL database. It also provides an API built with FastAPI, which enables users to fetch the offers and rank them based on certain criteria.
 
+```mermaid
+flowchart TD
+    A[webpage] --> S
+    S[scraper]-->B[database] 
+    D -->|trigger scraper| S
+    B --> C{API}
+    C --> D[scrape_data]
+    C --> E[get_data]
+    C -->F[get_file]
+```
+
+
+
 ## Installation
 
 1. Clone the repository:
@@ -21,11 +34,14 @@ This command will build the necessary Docker images and start the containers for
 ### Fetching Offers using FastAPI
 To access the API for fetching and ranking offers, make requests to the FastAPI server running in the Docker container. The server is accessible at http://localhost:8000.
 
-### Trigger Scrapper
-To trigger Scraper , make a Get request to http://localhost:8000/scrape_data.
 
-### Fetching Offers
+## Endpoints
+
+### scrape_data
+To trigger scraper, make a Get request to http://localhost:8000/scrape_data.
+
+### get_data
 To fetch all offers, make a GET request to http://localhost:8000/get_data.
 
-### Ranking Offers
-To rank the offers based on a specific criterion, make a GET request to http://localhost:8000/offers_rank. As response You will get top 30 offers.
+### get_file
+To get csv file with offers, make a GET request to http://localhost:8000/get_file. As response You will get top 30 offers.

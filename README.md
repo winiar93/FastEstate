@@ -25,6 +25,8 @@ This command will build the necessary Docker images and start the containers for
 ### Fetching Offers using FastAPI
 To access the API for fetching and ranking offers, make requests to the FastAPI server running in the Docker container. The server is accessible at http://localhost:8000.
 
+Additionaly You can use pgadmin to view data or make some analysis, it is accessible at http://localhost:8080/ .
+
 
 ## Endpoints
 

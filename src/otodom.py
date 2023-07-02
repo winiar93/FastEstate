@@ -13,7 +13,11 @@ class PageScraper:
         self.min_price = min_price
         self.max_price = max_price
         self.url_page:int = 1
-        self.url: str = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={self.url_page}&limit=36&priceMin={self.min_price}&priceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
+        # self.url: str = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={self.url_page}&limit=36&priceMin={self.min_price}&priceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
+
+    def url_builder(self, page:int):
+        url = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={page}&limit=36&priceMin={self.min_price}&priceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
+        return url
 
     def perform_request(self, url):
         try:
@@ -32,16 +36,19 @@ class PageScraper:
         return response
     
     def get_data(self):
-        response_data = self.perform_request(self.url)
+
+        response_data = self.perform_request(self.url_builder(page=1))
         soup = bs(response_data.content, "html.parser")
         soup_list = soup.find(type="application/json")
         data = json.loads(soup_list.text)
         page_count = data["props"]["pageProps"]["data"]["searchAds"]["pagination"]["totalPages"]
+        logging.info(f'Detected {page_count} pages with offers.')
         offers_data = data["props"]["pageProps"]["data"]["searchAds"]["items"]
 
         for page in range(1, page_count+1):
-            self.url_page = page
-            data = response_data = self.perform_request(self.url)
+            #TODO: consider better url handling
+            url = self.url_builder(page=page)
+            data = response_data = self.perform_request(url)
             soup = bs(data.content, "html.parser")
             soup_list = soup.find(type="application/json")
             data = json.loads(soup_list.text)

@@ -14,6 +14,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text, desc
 import pandas as pd
 from db_connector import DBConnector
+import pyodbc
+
 
 import logging
 
@@ -91,3 +93,20 @@ async def get_data():
     engine.dispose()
     logging.info(f'Output saved into csv file.')
     return FileResponse(file_name, media_type='application/octet-stream', filename=file_name)
+
+
+@app.get("/sync_db")
+async def sync():
+
+
+    conn = pyodbc.connect(
+        'DRIVER={FreeTDS};SERVER=mssql;PORT=1433;DATABASE=otodom;UID=SA;PWD=Welcome1', autocommit=True)
+    cur = conn.cursor()
+    #This is just an example
+    cur.execute(
+        f"SELECT * from flat_offers")
+    for row in cur.fetchall():
+        print(row)
+        
+    cur.close()
+    conn.close()

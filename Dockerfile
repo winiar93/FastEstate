@@ -1,4 +1,5 @@
-FROM python:3.11.1-slim
+#FROM python:3.11.1-slim
+FROM tadeorubio/pyodbc-msodbcsql17
 #WORKDIR /app
 
 COPY requirements.txt .

@@ -31,7 +31,7 @@ Additionaly You can use pgadmin to view data or make some analysis, it is access
 ## Endpoints
 
 ### scrape_data
-To trigger scraper, make a Get request to http://localhost:8000/scrape_data.
+To trigger scraper, make a GET request to http://localhost:8000/scrape_data.
 
 ### get_data
 To fetch all offers, make a GET request to http://localhost:8000/get_data.

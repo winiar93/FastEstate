@@ -37,4 +37,4 @@ To trigger scraper, make a GET request to http://localhost:8000/scrape_data.
 To fetch all offers, make a GET request to http://localhost:8000/get_data.
 
 ### get_file
-To get csv file with offers, make a GET request to http://localhost:8000/get_file. As response You will get top 30 offers.
+To get csv file with offers, make a GET request to http://localhost:8000/get_file.

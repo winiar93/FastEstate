@@ -96,17 +96,36 @@ async def get_data():
 
 
 @app.get("/sync_db")
-async def sync():
-
+async def sync(session: Session = Depends(db_session)):
 
     conn = pyodbc.connect(
-        'DRIVER={FreeTDS};SERVER=mssql;PORT=1433;DATABASE=otodom;UID=SA;PWD=Welcome1', autocommit=True)
+    'DRIVER={FreeTDS};SERVER=mssql;PORT=1433;DATABASE=otodom;UID=SA;PWD=Welcome1', autocommit=True)
     cur = conn.cursor()
-    #This is just an example
-    cur.execute(
-        f"SELECT * from flat_offers")
-    for row in cur.fetchall():
-        print(row)
-        
+    stmt = select(FlatOffers)
+    data = session.exec(stmt).all()
+    cur.execute("Truncate table otodom.dbo.flat_offers;")
+    for row in data:
+        try:
+            insert_stmt = f"""INSERT INTO otodom.dbo.flat_offers
+            (offer_id, offer_title, street, location, total_price, area_square_meters,
+            date_created, offer_url, agency_name, rooms_number, investment_estimated_delivery, price_per_square_meter)
+            VALUES({row.offer_id},
+            '{row.offer_title}',
+            '{row.street}',
+            '{row.location}',
+            '{row.total_price}',
+            '{row.area_square_meters}',
+            '{row.created_at}',
+            '{row.offer_url}',
+            '{row.agency_name}',
+            '{row.rooms_number}',
+            '{row.investment_estimated_delivery}', 
+            '{row.price_per_square_meter}');"""
+            cur.execute(insert_stmt)
+        except pyodbc.IntegrityError as int_err:
+            logging.warning(f'Error occured during inserting data /n ERROR: {int_err}')
+        else:
+            logging.info(f'Inserted row with ID = {row.dict().get("offer_id")}')
+
     cur.close()
     conn.close()

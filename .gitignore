@@ -161,3 +161,4 @@ cython_debug/
 
 sqlserver/
 drive/
+.vscode/settings.json

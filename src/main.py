@@ -15,6 +15,7 @@ from sqlalchemy import text, desc
 import pandas as pd
 from db_connector import DBConnector
 import pyodbc
+from typing import Any
 
 
 import logging
@@ -43,7 +44,7 @@ async def insert_data(
     session: Session = Depends(db_session),
     min_price: int = 300000,
     max_price: int = 450000,
-):
+) -> JSONResponse:
     ps = PageScraper(min_price=min_price, max_price=max_price)
     logging.info(f"Running web page scraper ...")
     data = ps.run()
@@ -79,7 +80,7 @@ async def get_data(
     page_size: int = 10,
     page: int = 0,
     rank_order: bool = True,
-):
+) -> Any:
     stmt = select(FlatOffers)
 
     if page_size:
@@ -102,7 +103,7 @@ async def get_data(
 
 
 @app.get("/get_file")
-async def get_data():
+async def get_data() -> FileResponse:
     file_name = "offers_of_flats.csv"
     stmt = select(FlatOffers)
     df = pd.read_sql_query(stmt, con=engine)
@@ -116,7 +117,7 @@ async def get_data():
 
 
 @app.get("/sync_db")
-async def sync(session: Session = Depends(db_session)):
+async def sync(session: Session = Depends(db_session)) -> None:
     conn = pyodbc.connect(
         "DRIVER={FreeTDS};SERVER=mssql;PORT=1433;DATABASE=otodom;UID=SA;PWD=Welcome1",
         autocommit=True,

@@ -14,7 +14,6 @@ class PageScraper:
         self.min_price = min_price
         self.max_price = max_price
         self.url_page: int = 1
-        # self.url: str = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={self.url_page}&limit=36&priceMin={self.min_price}&priceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
 
     def url_builder(self, page: int):
         url = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={page}&limit=36&priceMin={self.min_price}&priceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"

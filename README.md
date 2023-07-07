@@ -16,7 +16,7 @@ This project is a estate offers scraper written in Python. It allows you to scra
 2. Navigate to the project directory
 3. Build and run the Docker containers using Docker Compose:
    ```shell
-    docker-compose up -d
+    docker-compose up --build
 
 This command will build the necessary Docker images and start the containers for the scraper, PostgreSQL database, and FastAPI server.
 

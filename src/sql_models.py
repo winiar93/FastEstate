@@ -8,13 +8,6 @@ from sqlmodel import Column, Field, SQLModel
 
 
 class FlatOffers(SQLModel, table=True):
-    """
-    Model describes a schema for HubSpot Contact stored in idflow2 database.
-
-    Obligatory parameters:
-        - hubspot_id - HubSpot object ID, unique for each object.
-        - marketing_consent_optin - string ("true" or "false") or boolean value (true or false) - marketing consent
-    """
 
     __tablename__ = "flat_offers"
     offer_id: int = Field(default=None, primary_key=True)

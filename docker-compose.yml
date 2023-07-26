@@ -35,6 +35,7 @@ services:
 
           depends_on:
             - postgres
+            - mssql
     mssql:
           container_name: mssql
           image: mcr.microsoft.com/mssql/server:2019-latest

@@ -40,6 +40,7 @@ services:
     mssql:
           container_name: mssql
           image: mcr.microsoft.com/mssql/server:2019-latest
+          user: root
           environment:
               SA_PASSWORD: Welcome1
               ACCEPT_EULA: Y

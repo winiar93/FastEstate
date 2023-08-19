@@ -30,6 +30,15 @@ db_session = db.get_session
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
+def create_pgsql_extension():
+    try:
+        with Session(engine) as session:
+            logging.info('Creating psql extension.')
+            create_query = "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
+            session.execute(create_query)
+            session.commit()
+    except Exception as e:
+        logging.error(f'Error during creating extension! \n {e}')
 
 app = FastAPI()
 
@@ -37,6 +46,7 @@ app = FastAPI()
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+    create_pgsql_extension()
 
 
 @app.get("/scrape_data", status_code=200)

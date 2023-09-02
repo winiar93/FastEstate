@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as bs
 import json
 from datetime import datetime
 import logging
+from typing import List, Dict
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -13,61 +14,73 @@ class PageScraper:
         self.min_price = min_price
         self.max_price = max_price
         self.url_page: int = 1
+        self._offers_raw_data = dict()
+        self._page_count: int = 0
 
-    def url_builder(self, page: int):
+    def url_builder(self, page: int) -> str:
         url = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0" \
               f"&page={page}&limit=36&priceMin={self.min_price}&pri" \
               f"ceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
         return url
 
-    def perform_request(self, url):
+    def perform_request(self, url: str) -> requests.Response():
         try:
             response = requests.get(url, allow_redirects=True, headers=self.headers)
             response.raise_for_status()
 
-        except requests.exceptions.HTTPError as errh:
-            logging.warning("Http Error:", errh)
-        except requests.exceptions.ConnectionError as errc:
-            logging.warning("Error Connecting:", errc)
-        except requests.exceptions.Timeout as errt:
-            logging.warning("Timeout Error:", errt)
+        except requests.exceptions.HTTPError as err:
+            logging.warning("Http Error:", err)
+        except requests.exceptions.ConnectionError as err:
+            logging.warning("Error Connecting:", err)
+        except requests.exceptions.Timeout as err:
+            logging.warning("Timeout Error:", err)
         except requests.exceptions.RequestException as err:
             logging.warning("OOps: Something Else", err)
 
         return response
 
-    def get_data(self):
+    def get_data(self) -> List[Dict[str, str]]:
         response_data = self.perform_request(self.url_builder(page=1))
         soup = bs(response_data.content, "html.parser")
-
         soup_list = soup.find(type="application/json")
 
-        data = json.loads(soup_list.text)
+        self._offers_raw_data = json.loads(soup_list.text)
 
-        page_count = data["props"]["pageProps"]["data"]["searchAds"]["pagination"][
-            "totalPages"
-        ]
-        logging.info(f"Detected {page_count} pages with offers.")
-        offers_data = data["props"]["pageProps"]["data"]["searchAds"]["items"]
+        return self._offers_raw_data
 
-        for page in range(1, page_count + 1):
-            # TODO: consider better url handling
-            url = self.url_builder(page=page)
-            data = self.perform_request(url)
-            soup = bs(data.content, "html.parser")
+    def get_page_count(self) -> int:
+        try:
+            self._page_count = self._offers_raw_data["props"]["pageProps"]["data"]["searchAds"]["pagination"][
+                "totalPages"
+            ]
+            logging.info(f"Detected {self._page_count} pages with offers.")
+        except KeyError:
+            logging.error('Error processing data, totalPages value not fount')
 
-            soup_list = soup.find(type="application/json")
+        return self._page_count
 
-            data = json.loads(soup_list.text)
+    def get_data_by_pagination(self) -> List[Dict[str, str]]:
 
-            new_offers = data["props"]["pageProps"]["data"]["searchAds"]["items"]
-            offers_data.extend(new_offers)
+        offers_data = self._offers_raw_data["props"]["pageProps"]["data"]["searchAds"]["items"]
+        logging.warning(f'offers_data {offers_data}')
+        for page in range(1, self._page_count + 1):
+            try:
+                url = self.url_builder(page=page)
+                data = self.perform_request(url)
+                soup = bs(data.content, "html.parser")
+                soup_list = soup.find(type="application/json")
+                data = json.loads(soup_list.text)
+                new_offers = data["props"]["pageProps"]["data"]["searchAds"]["items"]
+                offers_data.extend(new_offers)
+
+            except Exception as e:
+                logging.error(f'Error with performing request on page {page} \n more details: {e}')
 
         logging.info(f"Downloaded {len(offers_data)} flat offers.")
         return offers_data
 
     @staticmethod
-    def process_raw_data(offers_data):
+    def process_raw_data(offers_data: list) -> List[Dict[str, str]]:
         estate_offers_lst = list()
         for d in offers_data:
             estate_offer = dict()
@@ -126,5 +139,8 @@ class PageScraper:
         return estate_offers_lst
 
     def run(self):
-        data = self.get_data()
+        self.get_data()
+        self.get_page_count()
+        data = self.get_data_by_pagination()
+
         return self.process_raw_data(data)

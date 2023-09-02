@@ -10,13 +10,14 @@ logging.getLogger().setLevel(logging.INFO)
 class PageScraper:
     def __init__(self, min_price: int = 300000, max_price: int = 450000) -> None:
         self.headers: dict = {"User-Agent": "Mozilla/5.0"}
-        self.offers_data: list = None
         self.min_price = min_price
         self.max_price = max_price
         self.url_page: int = 1
 
     def url_builder(self, page: int):
-        url = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0&page={page}&limit=36&priceMin={self.min_price}&priceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
+        url = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0" \
+              f"&page={page}&limit=36&priceMin={self.min_price}&pri" \
+              f"ceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
         return url
 
     def perform_request(self, url):
@@ -38,8 +39,11 @@ class PageScraper:
     def get_data(self):
         response_data = self.perform_request(self.url_builder(page=1))
         soup = bs(response_data.content, "html.parser")
+
         soup_list = soup.find(type="application/json")
+
         data = json.loads(soup_list.text)
+
         page_count = data["props"]["pageProps"]["data"]["searchAds"]["pagination"][
             "totalPages"
         ]
@@ -49,65 +53,78 @@ class PageScraper:
         for page in range(1, page_count + 1):
             # TODO: consider better url handling
             url = self.url_builder(page=page)
-            data = response_data = self.perform_request(url)
+            data = self.perform_request(url)
             soup = bs(data.content, "html.parser")
+
             soup_list = soup.find(type="application/json")
+
             data = json.loads(soup_list.text)
+
             new_offers = data["props"]["pageProps"]["data"]["searchAds"]["items"]
             offers_data.extend(new_offers)
 
         logging.info(f"Downloaded {len(offers_data)} flat offers.")
         return offers_data
 
-    def process_raw_data(self, offers_data):
-        output = list()
+    @staticmethod
+    def process_raw_data(offers_data):
+        estate_offers_lst = list()
         for d in offers_data:
-            offer_enitity = dict()
+            estate_offer = dict()
             try:
                 offer_id = d.get("id")
                 offer_title = d.get("title")
                 address = d.get("location").get("address").get("street")
+                street = None
                 if address:
                     street = address.get("name", "empty")
 
-                location = d.get("locationLabel").get("value")
-                total_price = d.get("totalPrice").get("value")
+                location = d.get("locationLabel", {}).get("value")
+                total_price_dict = d.get("totalPrice")
+
+                total_price = None
+                if total_price_dict:
+                    total_price = total_price_dict.get("value")
+
                 area_square_meters = d.get("areaInSquareMeters")
                 date_created_in_service = d.get("dateCreated")
                 offer_url = "https://www.otodom.pl/pl/oferta/" + d.get("slug")
                 agency = d.get("agency")
+                agency_name = None
                 if agency:
                     agency_name = agency.get("name")
-                rooms_number = d.get("roomsNumber")
-                investment_estimated_delivery = d.get("investmentEstimatedDelivery")
-                price_per_square_meter = d.get("pricePerSquareMeter").get("value")
 
-                offer_enitity["offer_id"] = offer_id
-                offer_enitity["offer_title"] = offer_title
-                offer_enitity["street"] = street
-                offer_enitity["location"] = location
-                offer_enitity["total_price"] = total_price
-                offer_enitity["area_square_meters"] = area_square_meters
-                offer_enitity["date_created_in_service"] = date_created_in_service
-                offer_enitity["offer_url"] = offer_url
-                offer_enitity["agency_name"] = agency_name
-                offer_enitity["rooms_number"] = rooms_number
-                offer_enitity[
+                rooms_number = d.get("roomsNumber")
+                investment_estimated_delivery = d.get("investmentEstimatedDelivery", {})
+                price_per_square_meter_dict = d.get("pricePerSquareMeter")
+                price_per_square_meter = None
+                if price_per_square_meter_dict:
+                    price_per_square_meter = price_per_square_meter_dict.get("value")
+
+                estate_offer["offer_id"] = offer_id
+                estate_offer["offer_title"] = offer_title
+                estate_offer["street"] = street
+                estate_offer["location"] = location
+                estate_offer["total_price"] = total_price
+                estate_offer["area_square_meters"] = area_square_meters
+                estate_offer["date_created_in_service"] = date_created_in_service
+                estate_offer["offer_url"] = offer_url
+                estate_offer["agency_name"] = agency_name
+                estate_offer["rooms_number"] = rooms_number
+                estate_offer[
                     "investment_estimated_delivery"
                 ] = investment_estimated_delivery
-                offer_enitity["price_per_square_meter"] = price_per_square_meter
+                estate_offer["price_per_square_meter"] = price_per_square_meter
 
-                output.append(offer_enitity)
+                estate_offers_lst.append(estate_offer)
 
             except Exception as error:
                 logging.warning(
-                    f"Error with prosicessing data \n Error: {error} \n Item: {d}"
+                    f"Error with processing data \n Error: {error} \n Item: {d}"
                 )
 
-        return output
+        return estate_offers_lst
 
     def run(self):
         data = self.get_data()
-
-        output_data = self.process_raw_data(data)
-        return output_data
+        return self.process_raw_data(data)

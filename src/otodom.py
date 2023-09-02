@@ -11,10 +11,10 @@ logging.getLogger().setLevel(logging.INFO)
 class PageScraper:
     def __init__(self, min_price: int = 300000, max_price: int = 450000) -> None:
         self.headers: dict = {"User-Agent": "Mozilla/5.0"}
-        self.min_price = min_price
-        self.max_price = max_price
+        self.min_price: int = min_price
+        self.max_price: int = max_price
         self.url_page: int = 1
-        self._offers_raw_data = dict()
+        self._offers_raw_data: dict = dict()
         self._page_count: int = 0
 
     def url_builder(self, page: int) -> str:
@@ -29,13 +29,13 @@ class PageScraper:
             response.raise_for_status()
 
         except requests.exceptions.HTTPError as err:
-            logging.warning("Http Error:", err)
+            logging.error("Http Error:", err)
         except requests.exceptions.ConnectionError as err:
-            logging.warning("Error Connecting:", err)
+            logging.error("Error Connecting:", err)
         except requests.exceptions.Timeout as err:
-            logging.warning("Timeout Error:", err)
+            logging.error("Timeout Error:", err)
         except requests.exceptions.RequestException as err:
-            logging.warning("OOps: Something Else", err)
+            logging.error("OOps: Something Else", err)
 
         return response
 
@@ -62,7 +62,6 @@ class PageScraper:
     def get_data_by_pagination(self) -> List[Dict[str, str]]:
 
         offers_data = self._offers_raw_data["props"]["pageProps"]["data"]["searchAds"]["items"]
-        logging.warning(f'offers_data {offers_data}')
         for page in range(1, self._page_count + 1):
             try:
                 url = self.url_builder(page=page)
@@ -132,7 +131,7 @@ class PageScraper:
                 estate_offers_lst.append(estate_offer)
 
             except Exception as error:
-                logging.warning(
+                logging.error(
                     f"Error with processing data \n Error: {error} \n Item: {d}"
                 )
 

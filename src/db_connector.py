@@ -11,15 +11,6 @@ import logging
 
 logging.getLogger().setLevel(logging.INFO)
 
-pg_user = "postgres"
-pg_dbname = "postgres"
-pg_password = "Welcome1"
-pg_host = "postgres"
-pg_port = 5432
-pg_con_string = (
-    f"postgresql+psycopg2://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_dbname}"
-)
-
 
 class DBConnector:
     def __init__(
@@ -39,14 +30,13 @@ class DBConnector:
         self.engine = self.get_sqlmodel_engine()
 
     def get_sqlmodel_engine(self):
-        engine = create_engine(pg_con_string)
+        engine = create_engine(self.pg_con_string)
         return engine
 
     def insert_flat_offer(self, item):
         try:
             conn = self.engine.connect()
             stmt = insert(FlatOffers).values(item)
-
             stmt = stmt.on_conflict_do_update(
                 index_elements=[FlatOffers.offer_id],
                 set_={
@@ -59,9 +49,11 @@ class DBConnector:
             conn.execute(stmt)
             logging.info(f'Item with id = {item.get("offer_id")} upserted.')
             conn.commit()
-            conn.close()
+
         except SQLAlchemyError as e:
             logging.warning(f"Error in processing data: \n {e} \n Item: {item}")
+        finally:
+            conn.close()
 
     def get_session(self):
         engine = self.get_sqlmodel_engine()

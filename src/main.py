@@ -17,7 +17,6 @@ from db_connector import DBConnector
 import pyodbc
 from typing import Any
 
-
 import logging
 
 logging.getLogger().setLevel(logging.INFO)
@@ -30,15 +29,17 @@ db_session = db.get_session
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
+
 def create_pgsql_extension():
     try:
         with Session(engine) as session:
             logging.info('Creating psql extension.')
-            create_query = "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
-            session.execute(create_query)
+            create_extension_query: str = "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
+            session.execute(create_extension_query)
             session.commit()
     except Exception as e:
         logging.error(f'Error during creating extension! \n {e}')
+
 
 app = FastAPI()
 
@@ -51,19 +52,19 @@ def on_startup():
 
 @app.get("/scrape_data", status_code=200)
 async def insert_data(
-    session: Session = Depends(db_session),
-    min_price: int = 300000,
-    max_price: int = 450000,
+        session: Session = Depends(db_session),
+        min_price: int = 300000,
+        max_price: int = 450000,
 ) -> JSONResponse:
     ps = PageScraper(min_price=min_price, max_price=max_price)
     logging.info(f"Running web page scraper ...")
     data = ps.run()
-    inserted_enities_cnt = 0
+    inserted_entities_cnt = 0
     logging.info(f"Updating database.")
     for item in data:
         try:
             db.insert_flat_offer(item)
-            inserted_enities_cnt += 1
+            inserted_entities_cnt += 1
 
         except Exception as err:
             logging.warning(f"Operation failed: \n {err}")
@@ -75,9 +76,9 @@ async def insert_data(
         session.commit()
 
     output_dict = {
-        "is_success": True if len(data) == inserted_enities_cnt else False,
-        "total_enities": len(data),
-        "inserted_enities": inserted_enities_cnt,
+        "is_success": True if len(data) == inserted_entities_cnt else False,
+        "total_entities": len(data),
+        "inserted_entities": inserted_entities_cnt,
     }
 
     output = JSONResponse(content=output_dict)
@@ -86,10 +87,10 @@ async def insert_data(
 
 @app.get("/get_data")
 async def get_data(
-    session: Session = Depends(db_session),
-    page_size: int = 10,
-    page: int = 0,
-    rank_order: bool = True,
+        session: Session = Depends(db_session),
+        page_size: int = 10,
+        page: int = 0,
+        rank_order: bool = True,
 ) -> Any:
     stmt = select(FlatOffers)
 
@@ -155,7 +156,7 @@ async def sync(session: Session = Depends(db_session)) -> None:
             '{row.price_per_square_meter}');"""
             cur.execute(insert_stmt)
         except pyodbc.IntegrityError as int_err:
-            logging.warning(f"Error occured during inserting data /n ERROR: {int_err}")
+            logging.warning(f"Error occurred during inserting data /n ERROR: {int_err}")
         else:
             logging.info(f'Inserted row with ID = {row.dict().get("offer_id")}')
 

@@ -22,11 +22,12 @@ normalized_values AS (
     (area_square_meters - min_area) / (max_area - min_area) AS normalized_area,
     CASE
 	-- individually provided weights
-	WHEN rooms_number = 'ONE' THEN 0.2
-    WHEN rooms_number = 'TWO' THEN 0.6
-    WHEN rooms_number = 'THREE' THEN 1
-    WHEN rooms_number = 'FOUR' THEN 1
-    when rooms_number = 'FIVE' THEN 0.2
+	WHEN rooms_number = 1 THEN 0.2
+    WHEN rooms_number = 2 THEN 0.6
+    WHEN rooms_number = 3 THEN 1
+    WHEN rooms_number = 4 THEN 1
+    when rooms_number = 5 THEN 0.2
+    when rooms_number = 6 THEN 0.2
     END AS normalized_rooms_number
   FROM
     public.flat_offers

@@ -7,7 +7,15 @@ from typing import List, Dict
 
 logging.getLogger().setLevel(logging.INFO)
 
-
+word_to_number = {
+    'ONE': 1,
+    'TWO': 2,
+    'THREE': 3,
+    'FOUR': 4,
+    'FIVE': 5,
+    'SIX': 6,
+    # Add more mappings as needed
+}
 class PageScraper:
     def __init__(self, min_price: int = 300000,
                  max_price: int = 450000,
@@ -131,7 +139,9 @@ class PageScraper:
                 if agency:
                     agency_name = agency.get("name")
 
-                rooms_number = d.get("roomsNumber")
+                rooms_number_word = d.get("roomsNumber")
+                rooms_number= word_to_number[rooms_number_word]
+
                 investment_estimated_delivery = d.get("investmentEstimatedDelivery", {})
                 price_per_square_meter_dict = d.get("pricePerSquareMeter")
                 price_per_square_meter = None

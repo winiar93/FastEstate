@@ -54,9 +54,12 @@ def on_startup():
 async def insert_data(
         session: Session = Depends(db_session),
         min_price: int = 300000,
-        max_price: int = 450000,
+        max_price: int = 1000000,
+        province: str = "malopolskie",
+        district: str = "wielicki",
+        city: str = "wieliczka",
 ) -> JSONResponse:
-    ps = PageScraper(min_price=min_price, max_price=max_price)
+    ps = PageScraper(min_price=min_price, max_price=max_price, province=province, district=district, city=city)
     logging.info(f"Running web page scraper ...")
     data = ps.run()
     inserted_entities_cnt = 0

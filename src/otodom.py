@@ -9,19 +9,37 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 class PageScraper:
-    def __init__(self, min_price: int = 300000, max_price: int = 450000) -> None:
+    def __init__(self, min_price: int = 300000,
+                 max_price: int = 450000,
+                 province: str = "malopolskie",
+                 district: str = "wielicki",
+                 city: str = "wieliczka",
+                 ) -> None:
+
+        self.base_url = "https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie"
         self.headers: dict = {"User-Agent": "Mozilla/5.0"}
-        self.min_price: int = min_price
-        self.max_price: int = max_price
+        self.min_price = min_price
+        self.max_price = max_price
+        self.province = province
+        self.district = district
+        self.city = city
         self.url_page: int = 1
         self._offers_raw_data: dict = dict()
         self._page_count: int = 0
+        self.direction = "DESC"
+        self.view_type = "listing"
 
-    def url_builder(self, page: int) -> str:
-        url = f"https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/malopolskie/wielicki/wieliczka?distanceRadius=0" \
-              f"&page={page}&limit=36&priceMin={self.min_price}&pri" \
-              f"ceMax={self.max_price}&ownerTypeSingleSelect=ALL&by=PRICE&direction=ASC&viewType=listing"
-        return url
+    def url_builder(self, page: int, limit=36):
+
+        link = f"{self.base_url}?&page={page}&limit={limit}&ownerTypeSingleSelect=ALL&priceMin={self.min_price}&" \
+               f"priceMax={self.max_price}"
+        link += f"&by=DEFAULT&direction={self.direction}&viewType={self.view_type}"
+
+        if self.province and self.district and self.city:
+            location_str = f"{self.province}/{self.district}/{self.city}"
+            link += f"&locations=%5B{location_str}%5D"
+
+        return link
 
     def perform_request(self, url: str) -> requests.Response():
         try:
@@ -90,8 +108,15 @@ class PageScraper:
                 street = None
                 if address:
                     street = address.get("name", "empty")
+                try:
+                    location_list = d.get("location").get('reverseGeocoding').get('locations')
+                    if len(location_list) >= 1:
+                        location = location_list[-1].get('fullName')
+                except Exception as err:
+                    logging.error(f"Error with parsing location data: {d} \n", err)
+                    location = None
+                    pass
 
-                location = d.get("locationLabel", {}).get("value")
                 total_price_dict = d.get("totalPrice")
 
                 total_price = None

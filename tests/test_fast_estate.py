@@ -23,3 +23,19 @@ def test_page_scraper(page_number) -> None:
     ps = PageScraper()
     link = ps.url_builder(page=page_number)
     assert "https://www.otodom.pl" in link
+
+
+def test_get_data():
+    ps = PageScraper()
+    ps.get_data()
+    page_cnt_int = ps.get_page_count()
+    assert isinstance(page_cnt_int, int)
+    assert page_cnt_int > 0
+
+    ps._page_count = 1
+    raw_data = ps.get_data_by_pagination()
+    assert isinstance(raw_data, list)
+    estate_offers_lst = ps.process_raw_data(offers_data=raw_data[:1])
+    assert estate_offers_lst[0].get("offer_id") > 1
+
+

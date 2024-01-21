@@ -59,7 +59,6 @@ def test_mock_get_page_count(raw_data):
 
 def test_patch_get_page_count():
     ps = PageScraper()
-    # ps._offers_raw_data = raw_data
     with patch.object(ps, "_offers_raw_data", new=raw_data):
         page_count = ps.get_page_count()
         assert isinstance(page_count, int)

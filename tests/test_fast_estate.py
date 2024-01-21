@@ -1,7 +1,10 @@
-from src.otodom import PageScraper
-import pytest
 from unittest.mock import patch
+
+import pytest
+
+from src.otodom import PageScraper
 from testing_data import raw_data, raw_data_list
+
 
 @pytest.mark.parametrize("province,district,city", [("test_province", "test_district", "test_city")])
 def test_page_scraper_class(province, district, city):

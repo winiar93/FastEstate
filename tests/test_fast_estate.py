@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
 import pytest
 
@@ -6,7 +6,9 @@ from src.otodom import PageScraper
 from testing_data import raw_data, raw_data_list
 
 
-@pytest.mark.parametrize("province,district,city", [("test_province", "test_district", "test_city")])
+@pytest.mark.parametrize(
+    "province,district,city", [("test_province", "test_district", "test_city")]
+)
 def test_page_scraper_class(province, district, city):
     ps = PageScraper(province=province, district=district, city=city)
 
@@ -37,7 +39,9 @@ def test_get_data():
 
 
 def test_mock_get_data_by_pagination():
-    with patch("src.otodom.PageScraper.get_data_by_pagination", return_value=raw_data_list):
+    with patch(
+        "src.otodom.PageScraper.get_data_by_pagination", return_value=raw_data_list
+    ):
         ps = PageScraper()
         test_data_list = ps.get_data_by_pagination()
         estate_offers_lst = ps.process_raw_data(test_data_list)
@@ -51,3 +55,12 @@ def test_mock_get_page_count(raw_data):
     page_count = ps.get_page_count()
     assert isinstance(page_count, int)
     assert page_count == 3
+
+
+def test_patch_get_page_count():
+    ps = PageScraper()
+    # ps._offers_raw_data = raw_data
+    with patch.object(ps, "_offers_raw_data", new=raw_data):
+        page_count = ps.get_page_count()
+        assert isinstance(page_count, int)
+        assert page_count == 3

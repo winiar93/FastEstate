@@ -42,13 +42,16 @@ def test_get_data(page_scraper):
     assert estate_offers_lst[0].get("offer_id") > 1
 
 
-def test_mock_get_data_by_pagination(page_scraper):
-    with patch(
-        "src.otodom.PageScraper.get_data_by_pagination", return_value=raw_data_list
-    ):
-        test_data_list = page_scraper.get_data_by_pagination()
-        estate_offers_lst = page_scraper.process_raw_data(test_data_list)
-        assert estate_offers_lst[0].get("offer_id") == 64629218
+@patch.object(
+    PageScraper,
+    "get_data_by_pagination",
+    return_value=raw_data_list,
+)
+def test_mock_get_data_by_pagination(scraper_mock, page_scraper):
+    test_data_list = page_scraper.get_data_by_pagination()
+    estate_offers_lst = page_scraper.process_raw_data(test_data_list)
+    assert estate_offers_lst[0].get("offer_id") == 64629218
+    scraper_mock.assert_called_with()
 
 
 @pytest.mark.parametrize("raw_data", [raw_data])

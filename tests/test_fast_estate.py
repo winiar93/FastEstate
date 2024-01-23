@@ -84,3 +84,12 @@ def test_database_connection(mock_create_engine):
         db_connector.pg_con_string
         == "postgresql+psycopg2://mock_user:mock_password@mock_host:mock_port/mock_database"
     )
+
+
+def test_create_offer():
+    offer_data = {"offer_id": 123, "street": "Street 123", "offer_title": "Offer Title"}
+    test_single_offer = FlatOffers(**offer_data)
+    assert test_single_offer
+    assert test_single_offer.offer_id == offer_data["offer_id"]
+    assert test_single_offer.street == offer_data["street"]
+    assert test_single_offer.offer_title == offer_data["offer_title"]

@@ -1,9 +1,10 @@
-from unittest.mock import patch, PropertyMock
-
 import pytest
-
+from src.db_connector import DBConnector
 from src.otodom import PageScraper
+from src.sql_models import FlatOffers
+from unittest.mock import patch, PropertyMock, MagicMock
 from testing_data import raw_data, raw_data_list
+from sqlmodel import Session, SQLModel, create_engine
 
 
 @pytest.fixture(params=None, name="page_scraper")
@@ -67,3 +68,19 @@ def test_patch_get_page_count(page_scraper):
         page_count = page_scraper.get_page_count()
         assert isinstance(page_count, int)
         assert page_count == 3
+
+
+@patch("src.db_connector.DBConnector.get_sqlmodel_engine")
+def test_database_connection(mock_create_engine):
+    db_connector = DBConnector(
+        pg_user="mock_user",
+        pg_dbname="mock_database",
+        pg_password="mock_password",
+        pg_host="mock_host",
+        pg_port="mock_port",
+    )
+
+    assert (
+        db_connector.pg_con_string
+        == "postgresql+psycopg2://mock_user:mock_password@mock_host:mock_port/mock_database"
+    )

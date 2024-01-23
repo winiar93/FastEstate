@@ -4,7 +4,11 @@ from sqlmodel import Session, SQLModel, create_engine
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 
-from sql_models import FlatOffers
+try:
+    from sql_models import FlatOffers
+except ModuleNotFoundError:
+    from src.sql_models import FlatOffers
+
 import logging
 from datetime import datetime
 import logging
@@ -59,9 +63,3 @@ class DBConnector:
         engine = self.get_sqlmodel_engine()
         with Session(engine) as session:
             yield session
-
-    def test(self):
-        engine = self.get_sqlmodel_engine()
-        conn = engine.connect()
-        logging.info("ok")
-        conn.close()
